@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Puente Coffee — COGS Calculator</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f4f0;--surf:#fff;--b1:rgba(0,0,0,0.09);--b2:rgba(0,0,0,0.18);
+  --t1:#1a1a18;--t2:#6b6a65;--acc:#7a3f20;--acc-bg:#fdf3ee;
+  --ok-bg:#e6f4ec;--ok:#1d6a3b;--lo-bg:#fef3cd;--lo:#8a5c00;--hi-bg:#e6f0fb;--hi:#1a4a8a;
+  --inp:#fff;--div:rgba(0,0,0,0.08);
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#191917;--surf:#242420;--b1:rgba(255,255,255,0.09);--b2:rgba(255,255,255,0.18);
+  --t1:#f0efe8;--t2:#9a9990;--acc:#d4845a;--acc-bg:#2d1e15;
+  --ok-bg:#0d2e1c;--ok:#5cc98a;--lo-bg:#2d2005;--lo:#f5c842;--hi-bg:#0d1f36;--hi:#7ab4f0;
+  --inp:#1e1e1a;--div:rgba(255,255,255,0.08);
+}}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;background:var(--bg);color:var(--t1);font-size:13px;line-height:1.5;min-height:100vh}
+header{background:var(--surf);border-bottom:1px solid var(--b1);padding:14px 24px;display:flex;align-items:baseline;gap:10px;position:sticky;top:0;z-index:10}
+header h1{font-size:17px;font-weight:700;color:var(--acc)}
+header span{font-size:12px;color:var(--t2)}
+.page{max-width:1300px;margin:0 auto;padding:20px;display:grid;grid-template-columns:268px 1fr;gap:18px;align-items:start}
+.sb{display:flex;flex-direction:column;gap:10px;position:sticky;top:57px;max-height:calc(100vh - 77px);overflow-y:auto;padding-right:2px}
+.card{background:var(--surf);border:1px solid var(--b1);border-radius:10px;padding:13px 14px}
+.ct{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t2);margin-bottom:10px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:7px}
+.row:last-child{margin-bottom:0}
+.row label{font-size:12px;color:var(--t2);flex-shrink:0;min-width:80px}
+.row input[type=number]{width:72px;padding:3px 6px;border:1px solid var(--b2);border-radius:5px;background:var(--inp);color:var(--t1);font-size:12px;text-align:right;outline:none}
+.row input[type=number]:focus{border-color:var(--acc)}
+.row input[type=range]{flex:1}
+.row .vd{font-size:13px;font-weight:700;min-width:32px;text-align:right;color:var(--t1)}
+.div{height:1px;background:var(--div);margin:8px 0}
+.mbtn{width:100%;padding:7px 10px;border:1px solid var(--b2);border-radius:7px;background:transparent;color:var(--t2);font-size:12px;cursor:pointer;text-align:left;margin-bottom:5px;display:flex;justify-content:space-between;align-items:center}
+.mbtn:last-child{margin-bottom:0}
+.mbtn .ppo{font-size:11px;color:var(--t2)}
+.mbtn.on{background:var(--acc-bg);border-color:var(--acc);color:var(--acc);font-weight:500}
+.mbtn.on .ppo{color:var(--acc)}
+.milk-compare{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:8px}
+.mc-item{background:var(--bg);border-radius:6px;padding:5px 7px;text-align:center}
+.mc-label{font-size:10px;color:var(--t2);margin-bottom:2px}
+.mc-val{font-size:13px;font-weight:700;color:var(--t1)}
+.mc-unit{font-size:10px;color:var(--t2)}
+.main{display:flex;flex-direction:column;gap:18px}
+.sec-head{display:flex;align-items:baseline;gap:8px;margin-bottom:7px}
+.sec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--t2)}
+.tw{background:var(--surf);border:1px solid var(--b1);border-radius:10px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:760px}
+th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--t2);padding:8px 8px;border-bottom:1px solid var(--b1);white-space:nowrap;text-align:right;background:var(--surf)}
+th.tl{text-align:left}
+td{padding:5px 8px;border-bottom:1px solid var(--b1);text-align:right;color:var(--t2);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg)}
+td.dn{color:var(--t1);font-weight:600;text-align:left;min-width:145px;white-space:nowrap}
+td.tot{color:var(--t1);font-weight:700}
+td.rec{color:var(--acc);font-weight:700}
+td.comp{font-size:11px;color:var(--t2);text-align:left;white-space:nowrap}
+.pi,.moz{border:1px solid var(--b2);border-radius:5px;padding:3px 5px;background:var(--inp);color:var(--t1);font-size:12px;text-align:right;outline:none}
+.pi{width:60px}.moz{width:48px}
+.pi:focus,.moz:focus{border-color:var(--acc)}
+.badge{display:inline-block;padding:2px 6px;border-radius:5px;font-size:10px;font-weight:700;white-space:nowrap}
+.ok{background:var(--ok-bg);color:var(--ok)}.lo{background:var(--lo-bg);color:var(--lo)}.hi{background:var(--hi-bg);color:var(--hi)}
+.comp-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.comp-name{font-weight:700;font-size:12px;margin-bottom:4px}
+.comp-sub{font-weight:400;color:var(--t2);font-size:11px}
+.comp-list{font-size:11px;color:var(--t2);line-height:1.9}
+footer{text-align:center;padding:20px;font-size:11px;color:var(--t2)}
+</style>
+</head>
+<body>
+ 
+<header>
+  <h1>Puente Coffee</h1>
+  <span>COGS &amp; Pricing Calculator &mdash; Menchaca Road, South Austin</span>
+</header>
+ 
+<div class="page">
+ 
+  <!-- ── SIDEBAR ── -->
+  <aside class="sb">
+ 
+    <div class="card">
+      <div class="ct">Milk source &amp; cost per oz</div>
+      <button class="mbtn on" id="mb0" onclick="setMilk(0)">
+        <span>HEB Whole &middot; <span id="gal-lbl0">$4.34</span>/gal</span>
+        <span class="ppo" id="ppo0">$0.0339/oz</span>
+      </button>
+      <button class="mbtn" id="mb1" onclick="setMilk(1)">
+        <span>Hill Country &middot; <span id="gal-lbl1">$5.15</span>/gal</span>
+        <span class="ppo" id="ppo1">$0.0402/oz</span>
+      </button>
+      <button class="mbtn" id="mb2" onclick="setMilk(2)">
+        <span>Mill King &middot; <span id="gal-lbl2">$6.50</span>/gal</span>
+        <span class="ppo" id="ppo2">$0.0508/oz</span>
+      </button>
+      <div style="font-size:10px;color:var(--t2);margin-top:8px;margin-bottom:6px;font-weight:700;text-transform:uppercase;letter-spacing:.04em">Milk cost comparison (per oz)</div>
+      <div class="milk-compare">
+        <div class="mc-item">
+          <div class="mc-label">HEB</div>
+          <div class="mc-val" id="mc0">$0.034</div>
+          <div class="mc-unit">per oz</div>
+        </div>
+        <div class="mc-item">
+          <div class="mc-label">Hill Country</div>
+          <div class="mc-val" id="mc1">$0.040</div>
+          <div class="mc-unit">per oz</div>
+        </div>
+        <div class="mc-item">
+          <div class="mc-label">Mill King</div>
+          <div class="mc-val" id="mc2">$0.051</div>
+          <div class="mc-unit">per oz</div>
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--t2);margin-bottom:6px">Adjust purchase price</div>
+        <div class="row"><label>HEB ($/gal)</label><input type="number" id="mgal0" value="4.34" step="0.01" min="0" oninput="updateMilkPrices()"></div>
+        <div class="row"><label>Hill Country</label><input type="number" id="mgal1" value="5.15" step="0.01" min="0" oninput="updateMilkPrices()"></div>
+        <div class="row"><label>Mill King</label><input type="number" id="mgal2" value="6.50" step="0.01" min="0" oninput="updateMilkPrices()"></div>
+        <div style="font-size:10px;color:var(--t2);margin-top:4px">All prices per gallon (128 oz)</div>
+      </div>
+    </div>
+ 
+    <div class="card">
+      <div class="ct">Target markup</div>
+      <div class="row">
+        <label>Markup %</label>
+        <input type="range" id="mu-sl" min="20" max="80" value="40" step="1" oninput="setMarkup(+this.value)">
+        <span class="vd" id="mu-d">40%</span>
+      </div>
+      <div style="font-size:11px;color:var(--t2);margin-top:4px">Rec. price = COGS &times; (1 + markup%)</div>
+    </div>
+ 
+    <div class="card">
+      <div class="ct">Labor calculation</div>
+      <div class="row"><label>Wage ($/hr)</label><input type="number" id="wage" value="15" step="0.25" min="0" oninput="calcLabor()"></div>
+      <div class="row"><label>Shift (hrs)</label><input type="number" id="shift" value="8" step="0.5" min="1" oninput="calcLabor()"></div>
+      <div class="row"><label>Txns/day</label><input type="number" id="txns" value="50" step="1" min="1" oninput="calcLabor()"></div>
+      <div class="row"><label>Items/txn</label><input type="number" id="items" value="2.24" step="0.01" min="1" oninput="calcLabor()"></div>
+      <div class="div"></div>
+      <div class="row">
+        <label style="font-weight:700;color:var(--t1)">Labor / item</label>
+        <span id="lab-d" style="font-size:14px;font-weight:700;color:var(--acc)">$1.071</span>
+      </div>
+      <div style="font-size:10px;color:var(--t2);margin-top:2px">(wage &times; shift) &divide; txns &divide; items/txn</div>
+    </div>
+ 
+    <div class="card">
+      <div class="ct">Cup costs (cup + lid combined)</div>
+      <div class="row"><label>4 oz espresso</label><input type="number" id="c4" value="0.11" step="0.01" min="0" oninput="render()"></div>
+      <div class="row"><label>8 oz DW latte</label><input type="number" id="c8e" value="0.44" step="0.01" min="0" oninput="render()"></div>
+      <div class="row"><label>12 oz hot</label><input type="number" id="c12h" value="0.18" step="0.01" min="0" oninput="render()"></div>
+      <div class="row"><label>16 oz hot</label><input type="number" id="c16h" value="0.22" step="0.01" min="0" oninput="render()"></div>
+      <div class="row"><label>12 oz cold</label><input type="number" id="c12c" value="0.27" step="0.01" min="0" oninput="render()"></div>
+      <div class="row"><label>16 oz cold</label><input type="number" id="c16c" value="0.28" step="0.01" min="0" oninput="render()"></div>
+    </div>
+ 
+    <div class="card">
+      <div class="ct">Coffee</div>
+      <div class="row"><label>$/gram</label><input type="number" id="cpg" value="0.02568" step="0.001" min="0" oninput="render()"></div>
+      <div class="row"><label>Tariff mult.</label><input type="number" id="tariff" value="1.0" step="0.05" min="1.0" oninput="render()"></div>
+      <div class="div"></div>
+      <div class="row">
+        <label style="color:var(--t2)">1 dose (20g)</label>
+        <span id="dose-cost" style="font-size:12px;font-weight:600;color:var(--t1)">$0.514</span>
+      </div>
+    </div>
+ 
+    <div class="card">
+      <div class="ct">Buffer (water, ice, maintenance)</div>
+      <div class="row"><label>Standard ($)</label><input type="number" id="bufs" value="1.00" step="0.25" min="0" oninput="render()"></div>
+      <div class="row"><label>Drip ($)</label><input type="number" id="bufd" value="0.50" step="0.25" min="0" oninput="render()"></div>
+    </div>
+ 
+  </aside>
+ 
+  <!-- ── MAIN ── -->
+  <main class="main">
+ 
+    <div>
+      <div class="sec-head"><div class="sec-title">Espresso drinks</div></div>
+      <div class="tw">
+        <table>
+          <thead><tr>
+            <th class="tl">Drink</th>
+            <th>Cup</th><th>Coffee</th>
+            <th>Milk oz<br><span style="font-size:9px;font-weight:400;letter-spacing:0">(editable)</span></th>
+            <th>Milk $</th><th>Buffer</th><th>Labor</th>
+            <th>COGS</th><th>Rec. price</th><th>Your price</th><th>Markup</th>
+            <th class="tl">Comp. ref.</th>
+          </tr></thead>
+          <tbody id="esp-body"></tbody>
+        </table>
+      </div>
+    </div>
+ 
+    <div>
+      <div class="sec-head"><div class="sec-title">Drip coffee</div></div>
+      <div class="tw">
+        <table>
+          <thead><tr>
+            <th class="tl">Drink</th>
+            <th>Cup</th><th>Coffee</th>
+            <th>Milk oz<br><span style="font-size:9px;font-weight:400;letter-spacing:0">(editable)</span></th>
+            <th>Milk $</th><th>Buffer</th><th>Labor</th>
+            <th>COGS</th><th>Rec. price</th><th>Your price</th><th>Markup</th>
+            <th class="tl">Comp. ref.</th>
+          </tr></thead>
+          <tbody id="drip-body"></tbody>
+        </table>
+      </div>
+    </div>
+ 
+    <div>
+      <div class="sec-head"><div class="sec-title">Cold brew</div></div>
+      <div class="tw">
+        <table>
+          <thead><tr>
+            <th class="tl">Drink</th>
+            <th>Cup</th><th>Coffee</th>
+            <th>Milk oz<br><span style="font-size:9px;font-weight:400;letter-spacing:0">(editable)</span></th>
+            <th>Milk $</th><th>Buffer</th><th>Labor</th>
+            <th>COGS</th><th>Rec. price</th><th>Your price</th><th>Markup</th>
+            <th class="tl">Comp. ref.</th>
+          </tr></thead>
+          <tbody id="cb-body"></tbody>
+        </table>
+      </div>
+    </div>
+ 
+    <div class="card">
+      <div class="ct">South Austin competitor benchmarks — near Menchaca</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:14px">
+        <div>
+          <div class="comp-name">Golden Hour Cafe <span class="comp-sub">(S Congress)</span></div>
+          <div class="comp-list">Espresso / Macchiato $4<br>Cortado $4.50 &middot; Cappuccino $5<br>Latte (12oz) $6<br>Specialty Latte $7-8<br>Drip $4 &middot; Cold Brew $5/$6<br><span style="color:var(--acc);font-weight:600">⚠ Closest craft benchmark</span></div>
+        </div>
+        <div>
+          <div class="comp-name">The Hive <span class="comp-sub">(Menchaca) — direct neighbor</span></div>
+          <div class="comp-list">Espresso $2.25 &bull; Cortado $4.25<br>Cappuccino $4.50 &bull; Americano $4+<br>Latte $5.50 &bull; Caramel Mac $5.75<br>Drip $4.00 &bull; Cold Brew $4.50+<br>Seasonal lattes $5.60<br><span style="color:var(--acc);font-weight:600">⚠ Same block — biggest direct threat</span></div>
+        </div>
+        <div>
+          <div class="comp-name">Drifters Social Club <span class="comp-sub">(Menchaca)</span></div>
+          <div class="comp-list" style="color:var(--t2)"><span style="color:#c0392b;font-weight:700">CLOSED as of March 2026</span><br>Was coffee + bar hybrid<br>Vacated neighborhood slot<br><span style="color:var(--ok);font-weight:600">✓ One less direct competitor</span></div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div>
+          <div class="comp-name">Spokesman Coffee <span class="comp-sub">(St Elmo Rd)</span></div>
+          <div class="comp-list">Espresso $3.25<br>Cortado / Capp $4.25<br>Latte $4.75<br>Drip $2.75 &middot; Cold Brew $3.00<br><span style="color:var(--t2);font-style:italic">Budget-end anchor in market</span></div>
+        </div>
+        <div>
+          <div class="comp-name">Jo's Coffee <span class="comp-sub">(5532 Menchaca)</span></div>
+          <div class="comp-list">Drip $3.50+ &middot; Latte $5.00+<br>Cold Brew $5.50+<br>Alt milk upcharge +$1.25<br>High-volume, chain-adjacent feel</div>
+        </div>
+      </div>
+      <div style="margin-top:14px;padding:10px 12px;background:var(--acc-bg);border-radius:8px;border:1px solid var(--b1)">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--acc);margin-bottom:5px">Strategic positioning insight</div>
+        <div style="font-size:11px;color:var(--t1);line-height:1.7">
+          The Hive (same block) prices lattes at $5.50 and drip at $4.00 — but their espresso is a budget $2.25, signaling they're not chasing the craft tier.
+          Golden Hour is your true craft peer: lattes at $6, specialty at $7-8.
+          <strong>Puente's sweet spot is between them</strong> — craft quality matching Golden Hour, community feel to rival The Hive, priced to reflect both.
+          Recommended moves: espresso <strong>$4.00</strong>, cortado <strong>$4.50</strong>, latte 12oz <strong>$6.00</strong>, add a <strong>signature latte at $7-7.50</strong>.
+          On cold brew, The Hive's $4.50+ gives you room to hold at $5.25 and lead on quality.
+        </div>
+      </div>
+    </div>
+ 
+  </main>
+</div>
+ 
+<footer>Puente Coffee &mdash; COGS Calculator &mdash; <span id="today"></span></footer>
+ 
+<script>
+document.getElementById('today').textContent = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+ 
+// Milk state: purchase price per gallon (128 oz)
+let milkGal = [4.34, 5.15, 6.50];
+let mi = 0, markup = 40, lab = 1.071;
+ 
+function milkPPO(k) { return milkGal[k] / 128; }
+ 
+function updateMilkPrices() {
+  milkGal = [0,1,2].map(k => parseFloat(document.getElementById('mgal'+k).value) || 0);
+  [0,1,2].forEach(k => {
+    const ppo = milkPPO(k);
+    document.getElementById('ppo'+k).textContent = '$' + ppo.toFixed(4) + '/oz';
+    document.getElementById('mc'+k).textContent = '$' + ppo.toFixed(4);
+    document.getElementById('gal-lbl'+k).textContent = '$' + milkGal[k].toFixed(2);
+  });
+  render();
+}
+ 
+const DEFS = {
+  esp: [
+    {name:'Espresso',               cup:'4',   moz:0,  buf:'s', g:20,   price:3.75, comp:'Hive $2.25 | GH $4 | Spokesman $3.25'},
+    {name:'Macchiato',              cup:'4',   moz:6,  buf:'s', g:20,   price:4.25, comp:'Golden Hour $4'},
+    {name:'Cortado',                cup:'4',   moz:6,  buf:'s', g:20,   price:4.25, comp:'Hive $4.25 | GH $4.50 | Spokesman $4.25'},
+    {name:'Cappuccino / Flat White',cup:'8e',  moz:6,  buf:'s', g:20,   price:4.60, comp:'Hive $4.50 | GH $5 | Spokesman $4.25'},
+    {name:'Latte (8 oz)',           cup:'8e',  moz:8,  buf:'s', g:20,   price:5.00, comp:"Hive $5.50 | Jo's $5+ | Spokesman $4.75"},
+    {name:'Latte (12 oz)',          cup:'12h', moz:24, buf:'s', g:20,   price:5.50, comp:"Hive $5.50 | GH $6 | Jo's $5+"},
+    {name:'Specialty Latte (12oz)', cup:'12h', moz:24, buf:'s', g:20,   price:7.00, comp:'Hive seasonal $5.60 | GH $7-8 | Radio ~$9'},
+    {name:'Latte (16 oz)',          cup:'16h', moz:16, buf:'s', g:20,   price:6.00, comp:'Radio ~$9 w/upgrades'},
+  ],
+  drip: [
+    {name:'Drip (8 oz)',            cup:'16h', moz:1,  buf:'d', g:14.5, price:3.50, comp:"Hive $4 | GH $4 | Jo's $3.50 | Spokesman $2.75"},
+    {name:'Drip (12 oz)',           cup:'12h', moz:1,  buf:'d', g:20,   price:3.75, comp:"Hive $4 | GH $4 | Jo's $3.50+"},
+    {name:'Drip (16 oz)',           cup:'16h', moz:1,  buf:'d', g:26.5, price:4.00, comp:'Hive $4 | GH $4'},
+  ],
+  cb: [
+    {name:'Cold Brew (12 oz)',      cup:'12c', moz:1,  buf:'s', g:46.8, price:5.25, comp:"Hive $4.50+ | GH $5 | Jo's $5.50+"},
+    {name:'Cold Brew (16 oz)',      cup:'16c', moz:1,  buf:'s', g:67.6, price:6.00, comp:"Hive $4.50+ | GH $6"},
+  ]
+};
+ 
+// Mutable state per drink
+const state = {};
+['esp','drip','cb'].forEach(cat => {
+  state[cat] = {
+    prices: DEFS[cat].map(d => d.price),
+    moz: DEFS[cat].map(d => d.moz)
+  };
+});
+ 
+function v(id) { return parseFloat(document.getElementById(id).value) || 0; }
+function cupCost(k) {
+  return v({4:'c4','8e':'c8e','12h':'c12h','16h':'c16h','12c':'c12c','16c':'c16c'}[k]);
+}
+function bufCost(k) { return k === 's' ? v('bufs') : v('bufd'); }
+function coffCost(g) { return g * v('cpg') * v('tariff'); }
+function driveCOGS(d, moz) {
+  return cupCost(d.cup) + coffCost(d.g) + moz * milkPPO(mi) + bufCost(d.buf) + lab;
+}
+ 
+function badge(price, cg) {
+  const m = (price - cg) / cg * 100;
+  const diff = m - markup;
+  const cls = Math.abs(diff) < 5 ? 'ok' : diff < 0 ? 'lo' : 'hi';
+  return `<span class="badge ${cls}">${m.toFixed(0)}%</span>`;
+}
+ 
+function renderSec(cat, tbodyId) {
+  const defs = DEFS[cat], s = state[cat];
+  let h = '';
+  defs.forEach((d, i) => {
+    const moz = s.moz[i];
+    const milkCost = moz * milkPPO(mi);
+    const cg = driveCOGS(d, moz);
+    const rec = cg * (1 + markup / 100);
+    const p = s.prices[i];
+    h += `<tr>
+      <td class="dn">${d.name}</td>
+      <td>$${cupCost(d.cup).toFixed(2)}</td>
+      <td>$${coffCost(d.g).toFixed(3)}</td>
+      <td><input class="moz" type="number" value="${moz}" step="1" min="0" onchange="setMoz('${cat}',${i},+this.value)"></td>
+      <td>$${milkCost.toFixed(3)}</td>
+      <td>$${bufCost(d.buf).toFixed(2)}</td>
+      <td>$${lab.toFixed(3)}</td>
+      <td class="tot">$${cg.toFixed(2)}</td>
+      <td class="rec">$${rec.toFixed(2)}</td>
+      <td><input class="pi" type="number" value="${p.toFixed(2)}" step="0.25" min="0" oninput="setPrice('${cat}',${i},+this.value)"></td>
+      <td id="b-${cat}-${i}">${badge(p, cg)}</td>
+      <td class="comp">${d.comp}</td>
+    </tr>`;
+  });
+  document.getElementById(tbodyId).innerHTML = h;
+}
+ 
+function render() {
+  // Milk buttons
+  [0,1,2].forEach(k => {
+    document.getElementById('mb'+k).className = 'mbtn' + (k === mi ? ' on' : '');
+  });
+  document.getElementById('mu-d').textContent = markup + '%';
+  // Dose cost preview
+  document.getElementById('dose-cost').textContent = '$' + coffCost(20).toFixed(3);
+  renderSec('esp','esp-body');
+  renderSec('drip','drip-body');
+  renderSec('cb','cb-body');
+}
+ 
+function calcLabor() {
+  const w = v('wage'), s = v('shift'), t = v('txns'), it = v('items');
+  const l = (w * s) / t / it;
+  lab = isFinite(l) ? l : 1.071;
+  document.getElementById('lab-d').textContent = '$' + lab.toFixed(3);
+  render();
+}
+ 
+function setPrice(cat, idx, p) {
+  state[cat].prices[idx] = p;
+  const d = DEFS[cat][idx];
+  const cg = driveCOGS(d, state[cat].moz[idx]);
+  const el = document.getElementById(`b-${cat}-${idx}`);
+  if (el) el.innerHTML = badge(p, cg);
+}
+ 
+function setMoz(cat, idx, val) {
+  state[cat].moz[idx] = val;
+  render();
+}
+ 
+function setMilk(k) { mi = k; render(); }
+function setMarkup(v) { markup = v; render(); }
+ 
+// Init milk labels
+updateMilkPrices();
+render();
+</script>
+</body>
+</html>
