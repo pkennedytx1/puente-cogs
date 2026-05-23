@@ -96,31 +96,30 @@ footer{text-align:center;padding:20px;font-size:11px;color:var(--t2)}
         <span>Mill King &middot; <span id="gal-lbl2">$6.50</span>/gal</span>
         <span class="ppo" id="ppo2">$0.0508/oz</span>
       </button>
-      <div style="font-size:10px;color:var(--t2);margin-top:8px;margin-bottom:6px;font-weight:700;text-transform:uppercase;letter-spacing:.04em">Milk cost comparison (per oz)</div>
-      <div class="milk-compare">
-        <div class="mc-item">
-          <div class="mc-label">HEB</div>
-          <div class="mc-val" id="mc0">$0.034</div>
-          <div class="mc-unit">per oz</div>
-        </div>
-        <div class="mc-item">
-          <div class="mc-label">Hill Country</div>
-          <div class="mc-val" id="mc1">$0.040</div>
-          <div class="mc-unit">per oz</div>
-        </div>
-        <div class="mc-item">
-          <div class="mc-label">Mill King</div>
-          <div class="mc-val" id="mc2">$0.051</div>
-          <div class="mc-unit">per oz</div>
-        </div>
+      <button class="mbtn" id="mb3" onclick="setMilk(3)">
+        <span>Oatly (Odeko) &middot; alt milk</span>
+        <span class="ppo" id="ppo3">$0.0950/oz</span>
+      </button>
+      <button class="mbtn" id="mb4" onclick="setMilk(4)">
+        <span>Almond (Odeko) &middot; alt milk</span>
+        <span class="ppo" id="ppo4">$0.1100/oz</span>
+      </button>
+      <div style="font-size:10px;color:var(--t2);margin-top:8px;margin-bottom:6px;font-weight:700;text-transform:uppercase;letter-spacing:.04em">Cost per oz — all milks</div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-bottom:8px">
+        <div class="mc-item"><div class="mc-label" style="font-size:9px">HEB</div><div class="mc-val" style="font-size:11px" id="mc0">$0.034</div></div>
+        <div class="mc-item"><div class="mc-label" style="font-size:9px">Hill Co.</div><div class="mc-val" style="font-size:11px" id="mc1">$0.040</div></div>
+        <div class="mc-item"><div class="mc-label" style="font-size:9px">Mill King</div><div class="mc-val" style="font-size:11px" id="mc2">$0.051</div></div>
+        <div class="mc-item"><div class="mc-label" style="font-size:9px">Oatly</div><div class="mc-val" style="font-size:11px" id="mc3">$0.095</div></div>
+        <div class="mc-item"><div class="mc-label" style="font-size:9px">Almond</div><div class="mc-val" style="font-size:11px" id="mc4">$0.110</div></div>
       </div>
-      <div style="margin-top:10px">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--t2);margin-bottom:6px">Adjust purchase price</div>
-        <div class="row"><label>HEB ($/gal)</label><input type="number" id="mgal0" value="4.34" step="0.01" min="0" oninput="updateMilkPrices()"></div>
-        <div class="row"><label>Hill Country</label><input type="number" id="mgal1" value="5.15" step="0.01" min="0" oninput="updateMilkPrices()"></div>
-        <div class="row"><label>Mill King</label><input type="number" id="mgal2" value="6.50" step="0.01" min="0" oninput="updateMilkPrices()"></div>
-        <div style="font-size:10px;color:var(--t2);margin-top:4px">All prices per gallon (128 oz)</div>
-      </div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--t2);margin-bottom:5px">Whole milk ($/gal)</div>
+      <div class="row"><label>HEB</label><input type="number" id="mgal0" value="4.34" step="0.01" min="0" oninput="updateMilkPrices()"></div>
+      <div class="row"><label>Hill Country</label><input type="number" id="mgal1" value="5.15" step="0.01" min="0" oninput="updateMilkPrices()"></div>
+      <div class="row"><label>Mill King</label><input type="number" id="mgal2" value="6.50" step="0.01" min="0" oninput="updateMilkPrices()"></div>
+      <div class="div"></div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--t2);margin-bottom:5px">Alt milk — Odeko ($/oz)</div>
+      <div class="row"><label>Oatly</label><input type="number" id="moz_3" value="0.095" step="0.001" min="0" oninput="updateMilkPrices()"></div>
+      <div class="row"><label>Almond</label><input type="number" id="moz_4" value="0.110" step="0.001" min="0" oninput="updateMilkPrices()"></div>
     </div>
  
     <div class="card">
@@ -158,14 +157,26 @@ footer{text-align:center;padding:20px;font-size:11px;color:var(--t2)}
     </div>
  
     <div class="card">
-      <div class="ct">Coffee</div>
-      <div class="row"><label>$/gram</label><input type="number" id="cpg" value="0.02568" step="0.001" min="0" oninput="render()"></div>
-      <div class="row"><label>Tariff mult.</label><input type="number" id="tariff" value="1.0" step="0.05" min="1.0" oninput="render()"></div>
+      <div class="ct">Green coffee cost</div>
+      <div class="row"><label>Bag cost ($)</label><input type="number" id="bag_cost" value="930" step="10" min="0" oninput="calcCoffee()"></div>
+      <div class="row"><label>Bag size (kg)</label><input type="number" id="bag_kg" value="69" step="1" min="1" oninput="calcCoffee()"></div>
+      <div class="row"><label>Weight loss %</label><input type="number" id="wt_loss" value="20" step="1" min="0" max="99" oninput="calcCoffee()"></div>
+      <div class="row"><label>Roast overhead %</label><input type="number" id="roast_oh" value="20" step="1" min="0" oninput="calcCoffee()"></div>
+      <div class="row"><label>Tariff mult.</label><input type="number" id="tariff" value="1.0" step="0.05" min="1.0" oninput="calcCoffee()"></div>
       <div class="div"></div>
       <div class="row">
-        <label style="color:var(--t2)">1 dose (20g)</label>
-        <span id="dose-cost" style="font-size:12px;font-weight:600;color:var(--t1)">$0.514</span>
+        <label style="color:var(--t2)">Roasted g (55.2kg)</label>
+        <span id="roasted_g" style="font-size:11px;font-weight:600;color:var(--t2)">55,200 g</span>
       </div>
+      <div class="row">
+        <label style="color:var(--t2)">Eff. $/gram</label>
+        <span id="eff_pg" style="font-size:12px;font-weight:600;color:var(--t1)">$0.02022</span>
+      </div>
+      <div class="row">
+        <label style="font-weight:700;color:var(--t1)">1 dose (20g)</label>
+        <span id="dose-cost" style="font-size:14px;font-weight:700;color:var(--acc)">$0.404</span>
+      </div>
+      <div style="font-size:10px;color:var(--t2);margin-top:4px">bag / (kg x 1000 x (1-loss)) x (1+overhead) x tariff</div>
     </div>
  
     <div class="card">
@@ -276,19 +287,32 @@ footer{text-align:center;padding:20px;font-size:11px;color:var(--t2)}
 <script>
 document.getElementById('today').textContent = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
  
-// Milk state: purchase price per gallon (128 oz)
-let milkGal = [4.34, 5.15, 6.50];
-let mi = 0, markup = 40, lab = 1.071;
+// Milk state — whole milks stored as $/gal, alt milks as $/oz directly
+const milkData = [
+  {name:'HEB Whole',       price:4.34,  isPerOz:false},
+  {name:'Hill Country',    price:5.15,  isPerOz:false},
+  {name:'Mill King',       price:6.50,  isPerOz:false},
+  {name:'Oatly (Odeko)',   price:0.095, isPerOz:true},
+  {name:'Almond (Odeko)',  price:0.110, isPerOz:true},
+];
+let mi = 0, markup = 40, lab = 1.071, effPG = 0.02022;
  
-function milkPPO(k) { return milkGal[k] / 128; }
+function milkPPO(k) {
+  return milkData[k].isPerOz ? milkData[k].price : milkData[k].price / 128;
+}
  
 function updateMilkPrices() {
-  milkGal = [0,1,2].map(k => parseFloat(document.getElementById('mgal'+k).value) || 0);
   [0,1,2].forEach(k => {
+    milkData[k].price = parseFloat(document.getElementById('mgal'+k).value) || 0;
+    document.getElementById('gal-lbl'+k).textContent = '$' + milkData[k].price.toFixed(2);
+  });
+  [3,4].forEach(k => {
+    milkData[k].price = parseFloat(document.getElementById('moz_'+k).value) || 0;
+  });
+  [0,1,2,3,4].forEach(k => {
     const ppo = milkPPO(k);
     document.getElementById('ppo'+k).textContent = '$' + ppo.toFixed(4) + '/oz';
     document.getElementById('mc'+k).textContent = '$' + ppo.toFixed(4);
-    document.getElementById('gal-lbl'+k).textContent = '$' + milkGal[k].toFixed(2);
   });
   render();
 }
@@ -300,9 +324,10 @@ const DEFS = {
     {name:'Cortado',                cup:'4',   moz:6,  buf:'s', g:20,   price:4.25, comp:'Hive $4.25 | GH $4.50 | Spokesman $4.25'},
     {name:'Cappuccino / Flat White',cup:'8e',  moz:6,  buf:'s', g:20,   price:4.60, comp:'Hive $4.50 | GH $5 | Spokesman $4.25'},
     {name:'Latte (8 oz)',           cup:'8e',  moz:8,  buf:'s', g:20,   price:5.00, comp:"Hive $5.50 | Jo's $5+ | Spokesman $4.75"},
-    {name:'Latte (12 oz)',          cup:'12h', moz:24, buf:'s', g:20,   price:5.50, comp:"Hive $5.50 | GH $6 | Jo's $5+"},
-    {name:'Specialty Latte (12oz)', cup:'12h', moz:24, buf:'s', g:20,   price:7.00, comp:'Hive seasonal $5.60 | GH $7-8 | Radio ~$9'},
-    {name:'Latte (16 oz)',          cup:'16h', moz:16, buf:'s', g:20,   price:6.00, comp:'Radio ~$9 w/upgrades'},
+    {name:'Latte (12 oz)',          cup:'12h', moz:10, buf:'s', g:20,   price:5.50, comp:"Hive $5.50 | GH $6 | Jo's $5+"},
+    {name:'Latte (16 oz)',          cup:'16h', moz:14, buf:'s', g:20,   price:6.00, comp:'Hive $5.50 | GH $6 | Radio ~$9'},
+    {name:'Iced Latte (12 oz)',     cup:'12c', moz:8,  buf:'s', g:20,   price:5.50, comp:'Hive $5.50 | GH $6'},
+    {name:'Iced Latte (16 oz)',     cup:'16c', moz:12, buf:'s', g:20,   price:6.00, comp:'GH $6 | Radio ~$9'},
   ],
   drip: [
     {name:'Drip (8 oz)',            cup:'16h', moz:1,  buf:'d', g:14.5, price:3.50, comp:"Hive $4 | GH $4 | Jo's $3.50 | Spokesman $2.75"},
@@ -329,9 +354,25 @@ function cupCost(k) {
   return v({4:'c4','8e':'c8e','12h':'c12h','16h':'c16h','12c':'c12c','16c':'c16c'}[k]);
 }
 function bufCost(k) { return k === 's' ? v('bufs') : v('bufd'); }
-function coffCost(g) { return g * v('cpg') * v('tariff'); }
+function coffCost(g) { return g * effPG; }
 function driveCOGS(d, moz) {
   return cupCost(d.cup) + coffCost(d.g) + moz * milkPPO(mi) + bufCost(d.buf) + lab;
+}
+ 
+function calcCoffee() {
+  const bagCost = v('bag_cost');
+  const bagKg   = v('bag_kg') || 69;
+  const wtLoss  = v('wt_loss') / 100;
+  const roastOH = v('roast_oh') / 100;
+  const tariff  = v('tariff') || 1;
+  const roastedG = bagKg * 1000 * (1 - wtLoss);
+  const rawPerG  = roastedG > 0 ? bagCost / roastedG : 0;
+  effPG = rawPerG * (1 + roastOH) * tariff;
+  const rg = document.getElementById('roasted_g');
+  if (rg) rg.textContent = roastedG.toLocaleString() + ' g (' + (roastedG/1000).toFixed(1) + 'kg)';
+  document.getElementById('eff_pg').textContent = '$' + effPG.toFixed(5);
+  document.getElementById('dose-cost').textContent = '$' + (effPG * 20).toFixed(3);
+  render();
 }
  
 function badge(price, cg) {
@@ -370,12 +411,10 @@ function renderSec(cat, tbodyId) {
  
 function render() {
   // Milk buttons
-  [0,1,2].forEach(k => {
+  [0,1,2,3,4].forEach(k => {
     document.getElementById('mb'+k).className = 'mbtn' + (k === mi ? ' on' : '');
   });
   document.getElementById('mu-d').textContent = markup + '%';
-  // Dose cost preview
-  document.getElementById('dose-cost').textContent = '$' + coffCost(20).toFixed(3);
   renderSec('esp','esp-body');
   renderSec('drip','drip-body');
   renderSec('cb','cb-body');
@@ -405,9 +444,10 @@ function setMoz(cat, idx, val) {
 function setMilk(k) { mi = k; render(); }
 function setMarkup(v) { markup = v; render(); }
  
-// Init milk labels
-updateMilkPrices();
-render();
+// Init
+calcCoffee();     // sets effPG first
+updateMilkPrices(); // updates ppo labels then calls render()
 </script>
 </body>
 </html>
+ 
